@@ -1,0 +1,22 @@
+{
+    "os": "macOS-11.2.1-arm64-arm-64bit",
+    "python": "3.8.10",
+    "heartbeatAt": "2021-09-02T22:17:57.978123",
+    "startedAt": "2021-09-02T22:17:57.425287",
+    "docker": null,
+    "cpu_count": 8,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "baselines.py",
+    "codePath": "baselines/baselines.py",
+    "git": {
+        "remote": "https://github.com/marktrovinger/DQN_implementation.git",
+        "commit": "016f13ae9089f910673f4d73baff7897d5eb9f36"
+    },
+    "email": "mark.trovinger@gmail.com",
+    "root": "/Users/marktrovinger/Projects/DQN_implementation",
+    "host": "marks-air.notrust.clients.wireless.pfw.edu",
+    "username": "marktrovinger",
+    "executable": "/Users/marktrovinger/miniforge3/envs/dqn_paper/bin/python"
+}

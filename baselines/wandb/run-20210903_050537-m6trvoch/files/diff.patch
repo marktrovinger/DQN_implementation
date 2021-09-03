@@ -1,0 +1,45 @@
+diff --git a/baselines/baselines.py b/baselines/baselines.py
+index 853592a..1af7734 100644
+--- a/baselines/baselines.py
++++ b/baselines/baselines.py
+@@ -35,22 +35,32 @@ def make_env():
+     env = gym.make(config["env_name"])
+     env = Monitor(env)
+     # gym has a nice module for preprocessing Atari images to the specification of
+-    # the Mnih paper
+-    env = AtariPreprocessing(env, grayscale_obs=True)
++    # the Mnih paper, however Pong-v0 has built in frame skip, so we need to handle it
++    # a different way
++    if config["env_name"] != "Pong-v0":
++        env = AtariPreprocessing(env, grayscale_obs=True)
+     return env
+ 
+ env = DummyVecEnv([make_env])
+-env = VecVideoRecorder(env, f"videos/{run.id}",
+-                       record_video_trigger=lambda x: x % 2000 == 0,
+-                       video_length=200")
++env = VecVideoRecorder(env, f"videos/{run.id}", record_video_trigger=lambda x: x % 2000 == 0,
++                       video_length=200)
+ 
+ # the default policy for CNN doesn't use quite the same settings as the paper,
+ # so we create a cnnpolicy
+ 
+-cnn_paper_policy = DQN.cnnpolicy(env.observation_space, env.action_space)
++   #cnn_paper_policy = DQN.cnnpolicy(env.observation_space, env.action_space, optimizer_class=torch.# optim.RMSProp(lr=0.00025, ))
++# matching the original paper will likely require some fiddling
+ 
++model = DQN(config['policy_type'], env, verbose=1,
++            tensorboard_log=f"runs/{run.id}")
++model.learn(
++    total_timesteps=config["total_timesteps"],
++    callback=WandbCallback(
++            gradient_save_freq=100,
++            model_save_path=f"models/{run.id}",
++            verbose=2,
+ 
+-# matching the original paper will likely require some fiddling
++    ),
+ 
+-model = DQN(config["policy_type"], learning_rate=0.00025, )
++)
+ 

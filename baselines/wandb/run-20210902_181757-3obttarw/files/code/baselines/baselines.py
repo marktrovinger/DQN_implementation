@@ -35,10 +35,8 @@ def make_env():
     env = gym.make(config["env_name"])
     env = Monitor(env)
     # gym has a nice module for preprocessing Atari images to the specification of
-    # the Mnih paper, however Pong-v0 has built in frame skip, so we need to handle it
-    # a different way
-    if config["env_name"] != "Pong-v0":
-        env = AtariPreprocessing(env, grayscale_obs=True)
+    # the Mnih paper
+    env = AtariPreprocessing(env, grayscale_obs=True)
     return env
 
 env = DummyVecEnv([make_env])
