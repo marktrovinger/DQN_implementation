@@ -13,7 +13,7 @@ envs = []
 config = {
     "policy_type":"CnnPolicy",
     "total_timesteps":1000000,
-    "env_name":"Pong-v0",
+    "env_name":"PongNoFrameskip-v4",
 }
 
 # run configuration
