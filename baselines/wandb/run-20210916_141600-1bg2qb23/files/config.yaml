@@ -1,0 +1,30 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    cli_version: 0.12.1
+    code_path: code/baselines/baselines.py
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    python_version: 3.8.11
+    start_time: 1631816160
+    t:
+      1:
+      - 1
+      2:
+      - 1
+      4: 3.8.11
+      5: 0.12.1
+      8:
+      - 5
+env_name:
+  desc: null
+  value: PongNoFrameskip-v4
+policy_type:
+  desc: null
+  value: CnnPolicy
+total_timesteps:
+  desc: null
+  value: 1000000

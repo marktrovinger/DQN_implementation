@@ -1,7 +1,6 @@
 import gym
 from gym.wrappers import AtariPreprocessing
 from stable_baselines3 import DQN
-from stable_baselines3.dqn import CnnPolicy
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
 import wandb
@@ -39,20 +38,17 @@ def make_env():
     # the Mnih paper, however Pong-v0 has built in frame skip, so we need to handle it
     # a different way, also the AtariPreprocessing module doesn't seem to output images
     # like we need
-    env = AtariPreprocessing(env, noop_max=30, grayscale_newaxis=True, grayscale_obs=True)
+    env = AtariPreprocessing(noop_max=30, grayscale_obs=True)
     return env
 
 env = DummyVecEnv([make_env])
 env = VecVideoRecorder(env, f"videos/{run.id}", record_video_trigger=lambda x: x % 2000 == 0,
                        video_length=200)
 
-print(env.observation_space.shape)
-
 # the default policy for CNN doesn't use quite the same settings as the paper,
 # so we create a cnnpolicy
 
-cnn_paper_policy = CnnPolicy(env.observation_space, env.action_space, lr_schedule=0.000025)
-print(cnn_paper_policy)
+cnn_paper_policy = DQN.cnnpolicy(env.observation_space, env.action_space)
 # matching the original paper will likely require some fiddling
 
 model = DQN(cnn_paper_policy, env, verbose=1,

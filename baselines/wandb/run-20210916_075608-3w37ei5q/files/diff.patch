@@ -1,0 +1,47 @@
+diff --git a/baselines/baselines.py b/baselines/baselines.py
+index bba806b..9e9a080 100644
+--- a/baselines/baselines.py
++++ b/baselines/baselines.py
+@@ -1,6 +1,7 @@
+ import gym
+ from gym.wrappers import AtariPreprocessing
+ from stable_baselines3 import DQN
++from stable_baselines3.dqn import CnnPolicy
+ from stable_baselines3.common.monitor import Monitor
+ from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
+ import wandb
+@@ -36,9 +37,9 @@ def make_env():
+     env = Monitor(env)
+     # gym has a nice module for preprocessing Atari images to the specification of
+     # the Mnih paper, however Pong-v0 has built in frame skip, so we need to handle it
+-    # a different way
+-    if config["env_name"] != "Pong-v0":
+-        env = AtariPreprocessing(env, grayscale_obs=True)
++    # a different way, also the AtariPreprocessing module doesn't seem to output images
++    # like we need
++    env = AtariPreprocessing(env, noop_max=30, grayscale_obs=True)
+     return env
+ 
+ env = DummyVecEnv([make_env])
+@@ -48,10 +49,10 @@ env = VecVideoRecorder(env, f"videos/{run.id}", record_video_trigger=lambda x: x
+ # the default policy for CNN doesn't use quite the same settings as the paper,
+ # so we create a cnnpolicy
+ 
+-   #cnn_paper_policy = DQN.cnnpolicy(env.observation_space, env.action_space, optimizer_class=torch.# optim.RMSProp(lr=0.00025, ))
++cnn_paper_policy = CnnPolicy(env.observation_space, env.action_space)
+ # matching the original paper will likely require some fiddling
+ 
+-model = DQN(config['policy_type'], env, verbose=1,
++model = DQN(cnn_paper_policy, env, verbose=1,
+             tensorboard_log=f"runs/{run.id}")
+ model.learn(
+     total_timesteps=config["total_timesteps"],
+diff --git a/baselines/wandb/latest-run b/baselines/wandb/latest-run
+index fcfb414..5f49873 120000
+--- a/baselines/wandb/latest-run
++++ b/baselines/wandb/latest-run
+@@ -1 +1 @@
+-run-20210903_050537-m6trvoch
+\ No newline at end of file
++run-20210916_075608-3w37ei5q
+\ No newline at end of file

@@ -52,7 +52,6 @@ print(env.observation_space.shape)
 # so we create a cnnpolicy
 
 cnn_paper_policy = CnnPolicy(env.observation_space, env.action_space, lr_schedule=0.000025)
-print(cnn_paper_policy)
 # matching the original paper will likely require some fiddling
 
 model = DQN(cnn_paper_policy, env, verbose=1,
