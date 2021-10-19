@@ -1,0 +1,33 @@
+diff --git a/baselines/baselines.py b/baselines/baselines.py
+index bba806b..9a54bc7 100644
+--- a/baselines/baselines.py
++++ b/baselines/baselines.py
+@@ -12,7 +12,7 @@ envs = []
+ # config, paper says 10M timesteps, testing on 1M
+ config = {
+     "policy_type":"CnnPolicy",
+-    "total_timesteps":1000000,
++    "total_timesteps":100,
+     "env_name":"PongNoFrameskip-v4",
+ }
+ 
+@@ -40,8 +40,8 @@ def make_env():
+     if config["env_name"] != "Pong-v0":
+         env = AtariPreprocessing(env, grayscale_obs=True)
+     return env
+-
+-env = DummyVecEnv([make_env])
++env = make_env()
++#env = DummyVecEnv([make_env])
+ env = VecVideoRecorder(env, f"videos/{run.id}", record_video_trigger=lambda x: x % 2000 == 0,
+                        video_length=200)
+ 
+diff --git a/baselines/wandb/latest-run b/baselines/wandb/latest-run
+index fcfb414..40c846b 120000
+--- a/baselines/wandb/latest-run
++++ b/baselines/wandb/latest-run
+@@ -1 +1 @@
+-run-20210903_050537-m6trvoch
+\ No newline at end of file
++run-20210913_123407-1fnbmjej
+\ No newline at end of file

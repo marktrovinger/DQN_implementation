@@ -1,0 +1,22 @@
+diff --git a/baselines/baselines.py b/baselines/baselines.py
+index 1af7734..c9b433e 100644
+--- a/baselines/baselines.py
++++ b/baselines/baselines.py
+@@ -13,7 +13,7 @@ envs = []
+ config = {
+     "policy_type":"CnnPolicy",
+     "total_timesteps":1000000,
+-    "env_name":"Pong-v0",
++    "env_name":"PongNoFrameSkip-v4",
+ }
+ 
+ # run configuration
+diff --git a/baselines/wandb/latest-run b/baselines/wandb/latest-run
+index fcfb414..045610f 120000
+--- a/baselines/wandb/latest-run
++++ b/baselines/wandb/latest-run
+@@ -1 +1 @@
+-run-20210903_050537-m6trvoch
+\ No newline at end of file
++run-20210911_152540-247rycb8
+\ No newline at end of file
