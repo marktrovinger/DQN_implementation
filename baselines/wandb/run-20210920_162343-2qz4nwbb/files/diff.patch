@@ -1,0 +1,121 @@
+diff --git a/baselines/baselines.py b/baselines/baselines.py
+index 9ae1d31..f429274 100644
+--- a/baselines/baselines.py
++++ b/baselines/baselines.py
+@@ -1,7 +1,9 @@
+ import gym
+-from gym.wrappers import AtariPreprocessing
++#from gym.wrappers import AtariPreprocessing
++
+ from stable_baselines3 import DQN
+ from stable_baselines3.dqn import CnnPolicy
++from stable_baselines3.common.env_util import make_atari_env
+ from stable_baselines3.common.monitor import Monitor
+ from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder
+ import wandb
+@@ -33,26 +35,25 @@ def make_env():
+     that environment
+     :env - gym environment
+     """
+-    env = gym.make(config["env_name"])
+-    env = Monitor(env)
++    env = make_atari_env(config["env_name"])
+     # gym has a nice module for preprocessing Atari images to the specification of
+     # the Mnih paper, however Pong-v0 has built in frame skip, so we need to handle it
+     # a different way, also the AtariPreprocessing module doesn't seem to output images
+     # like we need
+-    env = AtariPreprocessing(env, noop_max=30, grayscale_newaxis=True, grayscale_obs=True)
++    #env = AtariPreprocessing(env, noop_max=30, grayscale_newaxis=True, grayscale_obs=True)
+     return env
+ 
+-env = DummyVecEnv([make_env])
++env = make_env()
+ env = VecVideoRecorder(env, f"videos/{run.id}", record_video_trigger=lambda x: x % 2000 == 0,
+                        video_length=200)
+ 
+-print(env.observation_space.shape)
++#print(env.observation_space.shape)
+ 
+ # the default policy for CNN doesn't use quite the same settings as the paper,
+ # so we create a cnnpolicy
+ 
+ cnn_paper_policy = CnnPolicy(env.observation_space, env.action_space, lr_schedule=0.000025)
+-print(cnn_paper_policy)
++#print(cnn_paper_policy)
+ # matching the original paper will likely require some fiddling
+ 
+ model = DQN(cnn_paper_policy, env, verbose=1,
+diff --git a/baselines/simple_baseline.py b/baselines/simple_baseline.py
+index a89cacd..9f13a57 100644
+--- a/baselines/simple_baseline.py
++++ b/baselines/simple_baseline.py
+@@ -1,19 +1,50 @@
+ from stable_baselines3.common.env_util import make_atari_env
+-from stable_baselines3.common.vec_env import VecFrameStack
++from stable_baselines3.common.vec_env import VecFrameStack, DummyVecEnv, VecVideoRecorder, VecMonitor
++from stable_baselines3.common.monitor import Monitor
++from stable_baselines3.common.atari_wrappers import AtariWrapper
+ from stable_baselines3 import A2C
+ from stable_baselines3 import DQN
++import wandb
++from wandb.integration.sb3 import WandbCallback
+ 
+ # There already exists an environment generator
+ # that will make and wrap atari environments correctly.
+ # Here we are also multi-worker training (n_envs=4 => 4 environments)
+-env = make_atari_env('PongNoFrameskip-v4', n_envs=1, seed=0)
++
++config = {
++    "policy_type":"CnnPolicy",
++    "total_timesteps":10000,
++    "env_name":"PongNoFrameskip-v4"
++}
++
++run = wandb.init(
++    project="dqn_project",
++    config=config,
++    sync_tensorboard=True,
++    monitor_gym=True,
++    save_code=True,
++)
++
++def make_env():
++    env = make_atari_env('PongNoFrameskip-v4')
++    #env = AtariWrapper('PongNoFrameskip-v4')
++    #env = VecFrameStack(env, n_stack=4)
++    #env = VecMonitor(env)
++    return env
++
++env = make_env()
++env = VecVideoRecorder(env, f"videos/{run.id}", record_video_trigger=lambda x: x % 2000 == 0, video_length=200)
+ 
+ # Frame-stacking with 4 frames
+-env = VecFrameStack(env, n_stack=4)
+-model = DQN('CnnPolicy', env, verbose=1)
+-model.learn(total_timesteps=25000)
+-obs = env.reset()
+-while True:
+-    action, _states = model.predict(obs)
+-    obs, rewards, dones, info = env.step(action)
+-    env.render()
++#env = VecFrameStack(env, n_stack=4)
++
++model = DQN('CnnPolicy', env, verbose=1, tensorboard_log=f'runs/{run.id}')
++model.learn(
++    total_timesteps=config["total_timesteps"],
++    callback=WandbCallback(
++        gradient_save_freq=100,
++        model_save_path=f"models/{run.id}",
++        verbose=2,
++    ),
++)
++run.finish()
+diff --git a/baselines/wandb/latest-run b/baselines/wandb/latest-run
+index 4c532ac..5cdf260 120000
+--- a/baselines/wandb/latest-run
++++ b/baselines/wandb/latest-run
+@@ -1 +1 @@
+-run-20210916_141600-1bg2qb23
+\ No newline at end of file
++run-20210920_162343-2qz4nwbb
+\ No newline at end of file
